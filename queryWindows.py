@@ -37,7 +37,6 @@ class airportQueryWindow(QWidget):
             for row in rows:
                 location_ids.append(row[0])
             rows = cursor.fetchall()
-            print(location_ids)
 
         # Close the connection
         db.close()
@@ -49,15 +48,12 @@ class airportQueryWindow(QWidget):
         for curr_id in airline_ids:
             self.airlineid_dropdown.addItem(curr_id)
 
-
         self.tail_num_label = QLabel('Tail Number:', self)
         self.tail_num_input = QLineEdit(self)
         self.seat_capacity_label = QLabel('Seat Capacity:', self)
         self.seat_capacity_input = QLineEdit(self)
         self.speed_label = QLabel('Speed:', self)
         self.speed_input = QLineEdit(self)
-
-
         self.location_id_label = QLabel('Location ID:', self)
         self.location_id_dropdown = QComboBox(self)
 
@@ -113,7 +109,7 @@ class airportQueryWindow(QWidget):
         propeller = self.propeller_input.text()
         jet_engines = self.jet_engines_input.text()
 
-        airplane_data = (self.airlineid_dropdown.currentText(),
+        airplane_data = [self.airlineid_dropdown.currentText(),
                          self.tail_num_input.text(),
                          self.seat_capacity_input.text(),
                          self.speed_input.text(),
@@ -121,7 +117,11 @@ class airportQueryWindow(QWidget):
                          self.plane_type_input.text(),
                          self.skids_input.text(),
                          self.propeller_input.text(),
-                         self.jet_engines_input.text())
+                         self.jet_engines_input.text()]
+
+        for i in range(len(airplane_data)):
+            if airplane_data[i] == "":
+                airplane_data[i] = None
 
         print(airplane_data)
 
@@ -129,17 +129,8 @@ class airportQueryWindow(QWidget):
                          password='test123123', database='flight_management')
         # Add code to insert data into database here
         with db.cursor() as cursor:
-            cursor.callproc('add_airplane', args=('Air_France', 'n298po', '3', '100', 'port_5', 'prop', '1', '1', None))
+            cursor.callproc('add_airplane', args=airplane_data)
             print('test')
         db.commit()
 
         self.close()
-
-    def add_airplane_window(self):
-        window = QWidget()
-        window.setWindowTitle('Add Airplane')
-        window.setGeometry(400, 400, 400, 300)
-
-        self.airlineid_label = QLabel('Airline ID:', window)
-        self.airlineid_dropdown = QComboBox(window)
-        self.airlineid_dropdown.addItem('AA')
